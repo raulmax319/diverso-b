@@ -1,0 +1,22 @@
+# VSCode
+.vscode
+
+# NodeJS
+#
+node_modules/
+yarn-error.log
+
+.env
+
+# Certificate files
+#
+*.pem
+*.cer
+*.crt
+*.key
+
+# OSX
+#
+.DS_Store
+
+dist/
