@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum InvestimentType {
+  international
+  etf
+  national
+  fii
+  reit
+  crypto
+  valueReserve
+  fixedIncome
+  unknown
+}
+
+enum BudgetType {
+  fixedCosts 
+  comfort
+  goals
+  pleasures
+  freedom
+  knowledge
+  emergency
+}
+
+enum Strategy {
+  stock
+  reit
+  unknown
+}
+
+model Investiment {
+  id InvestimentType @unique
+  name String
+  color String
+}
+
+model DefaultQuestion {
+  id String @id @default(uuid())
+  criteria String
+  question String
+  strategy Strategy
+}
+
+model Question {
+  id String @id @default(uuid())
+  criteria String
+  question String
+  strategy Strategy
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Asset {
+  id String @id @default(uuid())
+  type InvestimentType
+  ticker String
+  quantity Float
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  questions String[]
+}
+
+model InvestimentGoal {
+  id String @id @default(uuid())
+  type InvestimentType
+  value Int
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model BudgetGoal {
+  id String @id @default(uuid())
+  type BudgetType
+  value Int
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model User {
+  id String @id @default(uuid())
+  name String?
+  email String @unique
+  password String @default("")
+  createdAt DateTime @default(now())
+  assets Asset[]
+  investimentGoals InvestimentGoal[]
+  budgetGoals BudgetGoal[]
+  questions Question[]
+}
