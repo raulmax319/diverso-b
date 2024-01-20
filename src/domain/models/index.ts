@@ -4,3 +4,6 @@ export * from './token.model';
 export * from './asset.model';
 export * from './question.model';
 export * from './goals.model';
+export * from './invest.model';
+export * from './symbol.model';
+export * from './yfinance.model';

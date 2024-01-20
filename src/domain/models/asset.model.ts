@@ -8,4 +8,6 @@ export interface Asset {
   userId?: string;
   questions?: Array<string>;
   score?: number;
+  currentPrice?: number;
+  position?: number;
 }

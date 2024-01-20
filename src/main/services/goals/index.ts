@@ -1,8 +1,9 @@
 import { BudgetGoal, InvestimentGoal } from 'domain/models';
+import { Service } from 'domain/service';
 import createHttpError from 'http-errors';
 import { DBClient } from 'main/db';
 
-export class GoalsService {
+export class GoalsService extends Service {
   public async findBudgetGoals(userId: string): Promise<Array<BudgetGoal>> {
     return await DBClient.shared.budgetGoal.findMany({
       where: { userId },

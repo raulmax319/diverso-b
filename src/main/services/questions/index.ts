@@ -1,7 +1,8 @@
 import { Question } from 'domain/models';
+import { Service } from 'domain/service';
 import { DBClient } from 'main/db';
 
-export class QuestionsService {
+export class QuestionsService extends Service {
   public async create(question: Question, userId: string): Promise<Question> {
     const data = {
       ...question,

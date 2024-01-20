@@ -1,7 +1,8 @@
 import { User } from 'domain/models';
+import { Service } from 'domain/service';
 import { DBClient } from 'main/db';
 
-export class UserService {
+export class UserService extends Service {
   public async findById(id: string): Promise<User> {
     const user = await DBClient.shared.user.findFirstOrThrow({
       select: {

@@ -1,10 +1,11 @@
 import bcrypt from 'bcrypt';
 import { Auth, BudgetGoal, Credentials, InvestimentGoal, User } from 'domain/models';
+import { Service } from 'domain/service';
 import createHttpError from 'http-errors';
 import { DBClient } from 'main/db';
 import { JsonWebToken } from 'src/infra/jwt';
 
-export class AuthService {
+export class AuthService extends Service {
   public async login(data: Credentials): Promise<Auth> {
     const { email } = data;
 
