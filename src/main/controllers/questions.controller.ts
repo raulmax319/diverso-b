@@ -12,8 +12,12 @@ export class QuestionsController {
   @Get('/')
   @Middleware([AuthMiddleware.validateToken, AuthMiddleware.validateHeader])
   private async getQuestionList(req: Request, res: Response) {
-    const questions = await this.questionsService.findAll(req.identifier);
-    res.status(200).json({ data: questions });
+    try {
+      const questions = await this.questionsService.findAll(req.identifier);
+      res.status(200).json({ data: questions });
+    } catch (error) {
+      res.status(500).json({ data: {}, error });
+    }
   }
 
   @Post('/create')
@@ -23,9 +27,13 @@ export class QuestionsController {
     ValidationMiddleware.validateBodyData,
   ])
   private async create(req: Request, res: Response) {
-    const data = req.body.data as Question;
-    const question = await this.questionsService.create(data, req.identifier);
-    res.status(200).json({ data: question });
+    try {
+      const data = req.body.data as Question;
+      const question = await this.questionsService.create(data, req.identifier);
+      res.status(200).json({ data: question });
+    } catch (error) {
+      res.status(500).json({ data: {}, error });
+    }
   }
 
   @Put('/update')
@@ -35,9 +43,13 @@ export class QuestionsController {
     ValidationMiddleware.validateBodyData,
   ])
   private async update(req: Request, res: Response) {
-    const data = req.body.data as Question;
-    const question = await this.questionsService.update(data, req.identifier);
-    res.status(200).json({ data: question });
+    try {
+      const data = req.body.data as Question;
+      const question = await this.questionsService.update(data, req.identifier);
+      res.status(200).json({ data: question });
+    } catch (error) {
+      res.status(500).json({ data: {}, error });
+    }
   }
 
   @Delete('/delete')
@@ -51,8 +63,8 @@ export class QuestionsController {
       const data = req.body.data as Question;
       const asset = await this.questionsService.delete(data.id, req.identifier);
       res.status(201).json({ data: asset });
-    } catch (e) {
-      res.status(400).json(e);
+    } catch (error) {
+      res.status(500).json({ data: {}, error });
     }
   }
 }
