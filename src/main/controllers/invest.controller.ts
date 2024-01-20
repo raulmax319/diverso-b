@@ -25,7 +25,9 @@ export class InvestController {
         return;
       }
 
-      res.status(200).json({ data: {}, error: null });
+      const result = await this.investService.invest(data.value, req.identifier);
+
+      res.status(200).json({ data: result, error: null });
     } catch (error) {
       res.status(500).json({ data: {}, error });
     }

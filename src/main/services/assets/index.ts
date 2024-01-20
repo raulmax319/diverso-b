@@ -77,8 +77,8 @@ export class AssetsService extends Service {
 
   public async findAllByUserId(userId: string): Promise<Array<Asset>> {
     try {
-      await this.fetchCrumb();
       if (!userId) throw createHttpError.NotFound('User not found.');
+      await this.fetchCrumb();
 
       const questions = await DBClient.shared.question.findMany({
         where: { userId },
@@ -115,7 +115,13 @@ export class AssetsService extends Service {
       const symbols = await this.fetchSymbols(`${currencies},${tickers.join(',')}`);
 
       return assets.map((ass) => {
-        if (ass.type === 'fixedIncome') return;
+        if (ass.type === 'fixedIncome')
+          return {
+            ...ass,
+            currentPrice: 3270,
+            position: 3270,
+          };
+
         const symbol = symbols.find((s) => {
           if (ass.type === 'national' || ass.type === 'fii') {
             const [ticker, suffix] = s.symbol.split('.');
