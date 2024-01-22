@@ -1,6 +1,7 @@
 import { User } from 'domain/models';
 import { Service } from 'domain/service';
 import { DBClient } from 'main/db';
+import { AssetsService } from '../assets';
 
 export class UserService extends Service {
   public async findById(id: string): Promise<User> {
@@ -8,7 +9,6 @@ export class UserService extends Service {
       select: {
         name: true,
         email: true,
-        assets: true,
         budgetGoals: {
           select: {
             id: true,
@@ -34,6 +34,8 @@ export class UserService extends Service {
       },
       where: { id },
     });
-    return user;
+
+    const assets = await new AssetsService().findAllByUserId(id);
+    return { ...user, assets };
   }
 }

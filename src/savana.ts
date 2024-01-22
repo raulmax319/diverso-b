@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import cors from 'cors';
 import { Server, getControllerInstances } from 'resdk';
 import * as controllers from 'main/controllers';
 import { DBClient } from 'main/db';
@@ -9,6 +10,7 @@ class Savana extends Server {
   constructor() {
     super();
 
+    this.app.use(cors({ exposedHeaders: 'X-Auth-Token' }));
     this.setupControllersInstances();
   }
 

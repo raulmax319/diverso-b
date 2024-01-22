@@ -22,107 +22,118 @@ export class AuthService extends Service {
   }
 
   public async register(user: User): Promise<Auth> {
-    const defaultQuestions = await DBClient.shared.defaultQuestion.findMany({
-      select: {
-        criteria: true,
-        question: true,
-        strategy: true,
-      },
-    });
+    try {
+      const defaultQuestions = await DBClient.shared.defaultQuestion.findMany({
+        select: {
+          criteria: true,
+          question: true,
+          strategy: true,
+        },
+      });
 
-    const defaultInvestimentGoals: Array<InvestimentGoal> = [
-      {
-        type: 'international',
-        value: 25,
-      },
-      {
-        type: 'etf',
-        value: 5,
-      },
-      {
-        type: 'national',
-        value: 30,
-      },
-      {
-        type: 'fii',
-        value: 10,
-      },
-      {
-        type: 'reit',
-        value: 10,
-      },
-      {
-        type: 'crypto',
-        value: 5,
-      },
-      {
-        type: 'valueReserve',
-        value: 0,
-      },
-      {
-        type: 'fixedIncome',
-        value: 15,
-      },
-    ];
+      const defaultInvestimentGoals: Array<InvestimentGoal> = [
+        {
+          type: 'international',
+          value: 25,
+        },
+        {
+          type: 'etf',
+          value: 5,
+        },
+        {
+          type: 'national',
+          value: 30,
+        },
+        {
+          type: 'fii',
+          value: 10,
+        },
+        {
+          type: 'reit',
+          value: 10,
+        },
+        {
+          type: 'crypto',
+          value: 5,
+        },
+        {
+          type: 'valueReserve',
+          value: 0,
+        },
+        {
+          type: 'fixedIncome',
+          value: 15,
+        },
+      ];
 
-    const defaultBudgetGoals: Array<BudgetGoal> = [
-      {
-        type: 'fixedCosts',
-        value: 30,
-      },
-      {
-        type: 'comfort',
-        value: 15,
-      },
-      {
-        type: 'goals',
-        value: 10,
-      },
-      {
-        type: 'pleasures',
-        value: 10,
-      },
-      {
-        type: 'freedom',
-        value: 25,
-      },
-      {
-        type: 'knowledge',
-        value: 5,
-      },
-      {
-        type: 'emergency',
-        value: 5,
-      },
-    ];
+      const defaultBudgetGoals: Array<BudgetGoal> = [
+        {
+          type: 'fixedCosts',
+          value: 30,
+        },
+        {
+          type: 'comfort',
+          value: 15,
+        },
+        {
+          type: 'goals',
+          value: 10,
+        },
+        {
+          type: 'pleasures',
+          value: 10,
+        },
+        {
+          type: 'freedom',
+          value: 25,
+        },
+        {
+          type: 'knowledge',
+          value: 5,
+        },
+        {
+          type: 'emergency',
+          value: 5,
+        },
+      ];
 
-    const result = await DBClient.shared.user.create({
-      data: {
-        ...user,
-        questions: {
-          createMany: {
-            data: defaultQuestions,
+      const result = await DBClient.shared.user.create({
+        data: {
+          ...user,
+          questions: {
+            createMany: {
+              data: defaultQuestions,
+            },
+          },
+          assets: {
+            createMany: {
+              data: [],
+            },
+          },
+          investimentGoals: {
+            createMany: {
+              data: defaultInvestimentGoals,
+            },
+          },
+          budgetGoals: {
+            createMany: {
+              data: defaultBudgetGoals,
+            },
           },
         },
-        investimentGoals: {
-          createMany: {
-            data: defaultInvestimentGoals,
-          },
+        select: {
+          id: true,
+          name: true,
+          email: true,
         },
-        budgetGoals: {
-          createMany: {
-            data: defaultBudgetGoals,
-          },
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-      },
-    });
+      });
 
-    const accessToken = await JsonWebToken.shared.sign(result);
-    return { user: result, accessToken };
+      const accessToken = await JsonWebToken.shared.sign(result);
+      this.logger.info({ user: result, accessToken });
+      return { user: result, accessToken };
+    } catch (error) {
+      this.logger.error(error);
+      createHttpError.InternalServerError(error);
+    }
   }
 }
