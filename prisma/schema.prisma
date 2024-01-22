@@ -38,12 +38,6 @@ enum Strategy {
   unknown
 }
 
-model Investiment {
-  id InvestimentType @unique
-  name String
-  color String
-}
-
 model DefaultQuestion {
   id String @id @default(uuid())
   criteria String

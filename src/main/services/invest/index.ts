@@ -68,32 +68,34 @@ export class InvestService extends Service {
       this.userGoals,
     );
 
-    return this.userAssets.map((ass) => {
-      const investimentType = investiments.find((inv) => inv.type === ass.type);
+    return this.userAssets
+      .map((ass) => {
+        const investimentType = investiments.find((inv) => inv.type === ass.type);
 
-      const scoreSum = this.userAssets
-        .filter((ass) => ass.type === investimentType.type)
-        ?.reduce((prev, a) => prev + a.score, 0);
+        const scoreSum = this.userAssets
+          .filter((ass) => ass.type === investimentType.type)
+          ?.reduce((prev, a) => prev + a.score, 0);
 
-      const suggestedPercentage = ass.score / scoreSum;
-      const suggestedValue = suggestedPercentage * investimentType.value;
-      let suggestedQuantity = suggestedValue / ass.currentPrice;
-      const totalAfterInvestiment = suggestedQuantity * ass.currentPrice;
-      const percentageAfterInvestiment = totalAfterInvestiment / investimentValue;
+        const suggestedPercentage = ass.score / scoreSum;
+        const suggestedValue = suggestedPercentage * investimentType.value;
+        let suggestedQuantity = suggestedValue / ass.currentPrice;
+        const totalAfterInvestiment = suggestedQuantity * ass.currentPrice + ass.position;
+        const percentageAfterInvestiment = totalAfterInvestiment / investimentValue;
 
-      if (ass.type === 'national' || ass.type === 'fii' || ass.ticker.includes('.T')) {
-        suggestedQuantity = Math.round(suggestedQuantity);
-        this.logger.info('\n', ass.ticker, suggestedQuantity);
-      }
+        if (ass.type === 'national' || ass.type === 'fii' || ass.ticker.includes('.T')) {
+          suggestedQuantity = Math.round(suggestedQuantity);
+          this.logger.info('\n', ass.ticker, suggestedQuantity);
+        }
 
-      return {
-        asset: ass,
-        suggestedValue,
-        suggestedQuantity,
-        totalAfterInvestiment,
-        percentageAfterInvestiment,
-      };
-    });
+        return {
+          asset: ass,
+          suggestedValue: suggestedQuantity * ass.currentPrice,
+          suggestedQuantity,
+          totalAfterInvestiment,
+          percentageAfterInvestiment,
+        };
+      })
+      .sort((a, b) => a.asset.type.localeCompare(b.asset.type));
   }
 
   public async invest(value: number, userId: string): Promise<Array<Suggestion>> {
