@@ -103,7 +103,7 @@ export class AssetsService extends Service {
           .length,
       }));
 
-      const currencies = 'BRL=X,JPYBRL=X,EURBRL=X';
+      const currencies = 'BRL=X,JPYBRL=X,EURBRL=X,AUDBRL=X,CHFBRL=X';
       const tickers = assets
         .filter((asset) => asset.type !== 'valueReserve' && asset.type !== 'fixedIncome')
         .map((a) => {
@@ -122,7 +122,7 @@ export class AssetsService extends Service {
             position: 3270,
           };
 
-        const symbol = symbols.find((s) => {
+        const symbol = symbols?.find((s) => {
           if (ass.type === 'national' || ass.type === 'fii') {
             const [ticker, suffix] = s.symbol.split('.');
 
@@ -148,9 +148,14 @@ export class AssetsService extends Service {
           return ass.ticker === s.symbol;
         });
 
-        const usd = symbols.find((s) => s.symbol === 'BRL=X');
-        const jpy = symbols.find((s) => s.symbol === 'JPYBRL=X');
-        const eur = symbols.find((s) => s.symbol === 'EURBRL=X');
+        this.logger.debug('ass', ass.ticker);
+        this.logger.debug('symbol', symbol);
+
+        const usd = symbols?.find((s) => s.symbol === 'BRL=X');
+        const jpy = symbols?.find((s) => s.symbol === 'JPYBRL=X');
+        const eur = symbols?.find((s) => s.symbol === 'EURBRL=X');
+        const aud = symbols?.find((s) => s.symbol === 'AUDBRL=X');
+        const chf = symbols?.find((s) => s.symbol === 'CHFBRL=X');
         let position: number = symbol.regularMarketPrice * ass.quantity;
         let currentPrice: number = symbol.regularMarketPrice;
 
@@ -169,6 +174,16 @@ export class AssetsService extends Service {
           position = currentPrice * ass.quantity;
         }
 
+        if (symbol.currency === 'AUD') {
+          currentPrice = symbol.regularMarketPrice * aud.regularMarketPreviousClose;
+          position = currentPrice * ass.quantity;
+        }
+
+        if (symbol.currency === 'CHF') {
+          currentPrice = symbol.regularMarketPrice * chf.regularMarketPreviousClose;
+          position = currentPrice * ass.quantity;
+        }
+
         return {
           ...ass,
           currentPrice,
@@ -182,6 +197,7 @@ export class AssetsService extends Service {
   }
 
   public async update(data: Asset, userId: string): Promise<Asset> {
+    this.logger.debug(data);
     const result = await DBClient.shared.asset.update({
       where: { id: data.id, userId },
       data,
